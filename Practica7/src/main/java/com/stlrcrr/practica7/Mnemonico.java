@@ -1,4 +1,4 @@
-package com.stlrcrr.practica6;
+package com.stlrcrr.practica7;
 
 /**
  *

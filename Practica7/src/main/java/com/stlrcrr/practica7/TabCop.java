@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.stlrcrr.practica6;
+package com.stlrcrr.practica7;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +14,8 @@ import java.util.List;
  */
 public class TabCop {
     private List<String> mnemonicos;
+    private HashMap<String, Etiqueta> etiquetas;
+    private HashMap<String, Directiva> directivas;
     private HashMap<String,Mnemonico> mnemonicosINH;
     private HashMap<String,Mnemonico> mnemonicosIMM;
     private HashMap<String,Mnemonico> mnemonicosDIR;
@@ -23,16 +25,26 @@ public class TabCop {
     public TabCop() {
         mnemonicos = new ArrayList<>();
         buildList();
+        
+        etiquetas = new HashMap<>();
+        
+        directivas = new HashMap<>();
+        buildTableDirectivas();
+        
         mnemonicosINH = new HashMap<>();
         buildTableINH();
+        
         mnemonicosIMM = new HashMap<>();
         buildTableIMM();
+        
         mnemonicosDIR = new HashMap<>();
         buildTableDIR();
+        
         mnemonicosEXT = new HashMap<>();
         buildTableEXT();        
-        //mnemonicosREL = new HashMap<>();
-        //buildTableREL();
+        
+        mnemonicosREL = new HashMap<>();
+        buildTableREL();
     }   
     
     private void buildTableINH(){
@@ -45,14 +57,12 @@ public class TabCop {
         mnemonicosINH.put("ASLD", new Mnemonico("ASLD", "INH", 1, "59"));        
         mnemonicosINH.put("ASRA", new Mnemonico("ASRA", "INH", 1, "47"));
         mnemonicosINH.put("ASRB", new Mnemonico("ASRB", "INH", 1, "57"));  
-                
-        
-        mnemonicosINH.put("BCC", new Mnemonico("BCC", "REL", 2, "24??"));  //RELATIVO
-        mnemonicosINH.put("BCS", new Mnemonico("BCS", "REL", 2, "25??"));  //RELATIVO
-        mnemonicosINH.put("BGND", new Mnemonico("BGND", "REL", 2, "2C??"));  //RELATIVO
     }
     
     private void buildTableREL(){
+        mnemonicosREL.put("BCC", new Mnemonico("BCC", "REL", 2, "24??"));  //RELATIVO
+        mnemonicosREL.put("BCS", new Mnemonico("BCS", "REL", 2, "25??"));  //RELATIVO
+        mnemonicosREL.put("BGND", new Mnemonico("BGND", "REL", 2, "2C??"));  //RELATIVO
     }
     
     private void buildTableIMM(){
@@ -120,6 +130,20 @@ public class TabCop {
         this.mnemonicos.add("BGND");
     }
 
+    private void buildTableDirectivas(){
+        directivas.put("ORG", new Directiva("ORG"));
+        directivas.put("END", new Directiva("END"));
+        directivas.put("EQU", new Directiva("EQU"));
+        directivas.put("START", new Directiva("START"));
+        directivas.put("DC.B", new Directiva("DC.B"));
+        directivas.put("DC.W", new Directiva("DC.W"));
+        directivas.put("BSZ", new Directiva("BSZ"));
+        directivas.put("ZMB", new Directiva("ZMB"));
+        directivas.put("FCB", new Directiva("FCB"));
+        directivas.put("FCC", new Directiva("FCC"));
+        directivas.put("FILL", new Directiva("FILL"));
+    }
+    
     public List<String> getMnemonicos() {
         return mnemonicos;
     }
@@ -159,6 +183,31 @@ public class TabCop {
     public void setMnemonicosEXT(HashMap<String, Mnemonico> mnemonicosEXT) {
         this.mnemonicosEXT = mnemonicosEXT;
     }
+
+    public HashMap<String, Mnemonico> getMnemonicosREL() {
+        return mnemonicosREL;
+    }
+
+    public void setMnemonicosREL(HashMap<String, Mnemonico> mnemonicosREL) {
+        this.mnemonicosREL = mnemonicosREL;
+    }
+
+    public HashMap<String, Etiqueta> getEtiquetas() {
+        return etiquetas;
+    }
+
+    public void setEtiquetas(HashMap<String, Etiqueta> etiquetas) {
+        this.etiquetas = etiquetas;
+    }
+
+    public HashMap<String, Directiva> getDirectivas() {
+        return directivas;
+    }
+
+    public void setDirectivas(HashMap<String, Directiva> directivas) {
+        this.directivas = directivas;
+    }
+    
     
     
     
