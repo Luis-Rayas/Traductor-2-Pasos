@@ -1,4 +1,4 @@
-package com.stlrcrr.practica7;
+package com.stlrcrr.Traductor2Pasos;
 
 /**
  *
