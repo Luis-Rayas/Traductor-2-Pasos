@@ -13,8 +13,7 @@ public class Mnemonico {
     //Operador es el numero ya convertido a hexadecimal
 
     public Mnemonico(String name) {
-        this.name = name;
-        
+        this.name = name;        
     }    
     
     public Mnemonico(String sourceForm, String addresMode,int longOpc, String machineCod) { 
@@ -24,6 +23,40 @@ public class Mnemonico {
         this.longInstruccion = longOpc;
     }
     
+    public Long getRelativeValue(Long operador, Long siguienteDir){
+        //Long operadorDecimal = Long.parseLong(operadorHex, 16);
+        //Long siguienteDireccion = Long.parseLong(siguienteDirHex, 16);
+        
+        Long resultado = operador - siguienteDir;        
+        return resultado;
+    }
+    
+    public Boolean relativeValueInRange(Long operador, Long siguienteDir){
+        Long value = operador - siguienteDir;
+        if(value < 0){ // negativo            
+            if(value >= -128 && value <= -1){
+                return true;
+            } else {
+                return false;
+            }
+        } else { //es positivo
+            if(value <= 127 && value >= 0){
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+    
+    public void setModoIndexadoIDX(String operador) throws Exception{
+        if(operador.contains(",")){
+            
+        } else {
+            //el metodo no es indexado o esta incorrecta la estructura
+            throw new Exception("El metodo no es indexado o esta incorrecta la estructura");
+        }
+    }
+
     public String getNombre() {
         return name;
     }

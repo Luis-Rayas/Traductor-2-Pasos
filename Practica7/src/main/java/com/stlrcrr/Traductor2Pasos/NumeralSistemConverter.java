@@ -72,16 +72,18 @@ public class NumeralSistemConverter {
     }
 
     private static String decimalToHexadecimal(int decimal) {
-        int residuo;
+        /*int residuo;
         String hexadecimal = "";
         char[] caracteresHexadecimales = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-        while (decimal > 0) {
-            residuo = decimal % 16;
-            char caracterHexadecimal = caracteresHexadecimales[residuo];
-            hexadecimal = caracterHexadecimal + hexadecimal;
-            decimal = decimal / 16;
-        }
-        return hexadecimal;
+        if(decimal >= 0){
+            while (decimal > 0) {
+                residuo = decimal % 16;
+                char caracterHexadecimal = caracteresHexadecimales[residuo];
+                hexadecimal = caracterHexadecimal + hexadecimal;
+                decimal = decimal / 16;
+            }
+        }*/
+        return Integer.toHexString(decimal).toUpperCase();
     }
 
 // Conversiones de otras bases a decimal

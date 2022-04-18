@@ -21,6 +21,7 @@ public class TabCop {
     private HashMap<String,Mnemonico> mnemonicosDIR;
     private HashMap<String,Mnemonico> mnemonicosEXT;
     private HashMap<String,Mnemonico> mnemonicosREL;
+    private HashMap<String,Mnemonico> mnemonicosIDX;
 
     public TabCop() {
         mnemonicos = new ArrayList<>();
@@ -45,12 +46,13 @@ public class TabCop {
         
         mnemonicosREL = new HashMap<>();
         buildTableREL();
+        
+        mnemonicosIDX = new HashMap<>();
+        buildTableIDX();
     }   
     
     private void buildTableINH(){
         mnemonicosINH.put("ABA", new Mnemonico("ABA", "INH", 2, "1606"));
-        mnemonicosINH.put("ABX", new Mnemonico("ABX", "IDX", 2, "1AE5"));
-        mnemonicosINH.put("ABY", new Mnemonico("ABY", "IDX", 2, "19ED"));
         mnemonicosINH.put("ASLA", new Mnemonico("ASLA", "INH", 1, "48"));
         mnemonicosINH.put("ASLB", new Mnemonico("ASLB", "INH", 1, "58"));
         
@@ -62,6 +64,7 @@ public class TabCop {
     private void buildTableREL(){
         mnemonicosREL.put("BCC", new Mnemonico("BCC", "REL", 2, "24??"));  //RELATIVO
         mnemonicosREL.put("BCS", new Mnemonico("BCS", "REL", 2, "25??"));  //RELATIVO
+        mnemonicosREL.put("BNE", new Mnemonico("BNE", "REL", 2, "26??"));  //RELATIVO
         mnemonicosREL.put("BGND", new Mnemonico("BGND", "REL", 2, "2C??"));  //RELATIVO
     }
     
@@ -102,6 +105,21 @@ public class TabCop {
         mnemonicosEXT.put("BCLR", new Mnemonico("BCLR", "EXT", 3, "1D????"));
     }
     
+    private void buildTableIDX() {        
+        mnemonicosIDX.put("ABX", new Mnemonico("ABX"));
+        mnemonicosIDX.put("ABY", new Mnemonico("ABY"));
+        mnemonicosIDX.put("ADCA", new Mnemonico("ADCA"));
+        mnemonicosIDX.put("ADCB", new Mnemonico("ADCB"));
+        mnemonicosIDX.put("ADDA", new Mnemonico("ADDA"));
+        mnemonicosIDX.put("ADDB", new Mnemonico("ADDB"));
+        mnemonicosIDX.put("ADDD", new Mnemonico("ADDD"));
+        mnemonicosIDX.put("ANDA", new Mnemonico("ANDA"));
+        mnemonicosIDX.put("ANDB", new Mnemonico("ANDB"));
+        mnemonicosIDX.put("ASL", new Mnemonico("ASL"));
+        mnemonicosIDX.put("ASR", new Mnemonico("ASR"));
+        mnemonicosIDX.put("BCLR", new Mnemonico("BCLR"));
+    }
+    
     private void buildList(){
         this.mnemonicos.add("ABA");
         this.mnemonicos.add("ABA");
@@ -128,6 +146,7 @@ public class TabCop {
         this.mnemonicos.add("BCS");
         
         this.mnemonicos.add("BGND");
+        this.mnemonicos.add("BNE");
     }
 
     private void buildTableDirectivas(){
@@ -207,6 +226,15 @@ public class TabCop {
     public void setDirectivas(HashMap<String, Directiva> directivas) {
         this.directivas = directivas;
     }
+
+    public HashMap<String, Mnemonico> getMnemonicosIDX() {
+        return mnemonicosIDX;
+    }
+
+    public void setMnemonicosIDX(HashMap<String, Mnemonico> mnemonicosIDX) {
+        this.mnemonicosIDX = mnemonicosIDX;
+    }
+
     
     
     

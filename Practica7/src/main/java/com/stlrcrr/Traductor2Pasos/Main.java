@@ -27,10 +27,10 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            File fileIn = new File("..\\P7.asm");
+            File fileIn = new File("..\\test.asm");
             File fileOut = new File("..\\" + fileIn.getName().replace(".asm", "") + ".lst");
             BufferedReader obj = null;
-            
+
             String line = "";
             Mnemonico value;
             Directiva directiva;
@@ -50,7 +50,7 @@ public class Main {
             boolean tieneEtiqueta;
             Integer vuelta = 1;
             try {
-                do{
+                do {
                     obj = new BufferedReader(new FileReader(fileIn));
                     finalContent = new StringBuilder();
                     while ((line = obj.readLine()) != null) {//lectura de linea por linea del archivo 
@@ -90,7 +90,7 @@ public class Main {
                                 }
                             }
                         } else if (tab.getMnemonicos().contains(palabra[0])) { // es un mnemonico
-                            if (tab.getMnemonicosINH().containsKey(palabra[0])) { // es un inherente
+                            if (tab.getMnemonicosINH().containsKey(palabra[0]) && value == null) { // es un inherente
                                 for (Map.Entry entry : tab.getMnemonicosINH().entrySet()) {
                                     if (palabra[0].equals(entry.getKey())) {
                                         value = (Mnemonico) entry.getValue();
@@ -133,7 +133,19 @@ public class Main {
                                 } else {
                                     error = true;
                                 }
-                            } // es extendido o es Directo
+                            } else if (tab.getMnemonicosIDX().containsKey(palabra[0])) { // es Inherente
+                                if (tab.getMnemonicosIDX().containsKey(palabra[0]) && value == null) {
+                                    for (Map.Entry entry : tab.getMnemonicosINH().entrySet()) {
+                                        if (palabra[0].equals(entry.getKey())) {
+                                            value = (Mnemonico) entry.getValue();
+                                            value.setModoIndexadoIDX(palabra[1]);
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    error = true;
+                                }
+                            }// es extendido o es Directo
                             if (operadorDecimal == null) { //obtener el codigo de operacion
                                 if (tab.getEtiquetas().containsKey(palabra[1])) {
                                     for (Map.Entry entryEtq : tab.getEtiquetas().entrySet()) {
@@ -157,15 +169,15 @@ public class Main {
                                         operador = palabra[1].substring(palabra[1].indexOf("%") + 1, palabra[1].length());
                                         operadorDecimal = Long.parseLong(operador, 2);
                                     } else if (operadorDecimal == null) {//sistema de numeracion decimal
-                                        try {                                            
+                                        try {
                                             operadorDecimal = Long.parseLong(palabra[1]);
-                                        } catch (NumberFormatException e){ 
+                                        } catch (NumberFormatException e) {
                                             //es probablemente una etiqueta
                                         }
-                                    } 
+                                    }
                                 }
                             }
-                            if(operadorDecimal != null){ //existe un operador
+                            if (operadorDecimal != null) { //existe un operador
                                 if (operadorDecimal <= 255) {
                                     if (tab.getMnemonicosDIR().containsKey(palabra[0]) && value == null) {
                                         for (Map.Entry entry : tab.getMnemonicosDIR().entrySet()) {
@@ -193,7 +205,7 @@ public class Main {
                                     }
                                 }
                             }
-                        } 
+                        }
                         //es probablemente una etiqueta                        
                         if (directiva != null) {
                             String codigoOperacion = "";
@@ -222,7 +234,7 @@ public class Main {
                                     break;
                                 case "END":
                                     finalContent.append("\t\t\t" + directiva.getNombre());
-                                    if(tieneEtiqueta){
+                                    if (tieneEtiqueta) {
                                         finalContent.append("\t\t");
                                         finalContent.append(etiqueta + ":");
                                     }
@@ -378,17 +390,31 @@ public class Main {
                                     }
                             }
                         } else if (value != null) {
+                            String codigoOperacion = "";
+                            if (value.getModoDireccionamiento().getAbbreviation().equals("REL")) { //validar rango del relativo
+                                Long ubicacionMemoriaTemp = ubicacionMemoria + value.getLongInstruccion();
+                                codigoOperacion = value.getCodOp();
+                                Long result = value.getRelativeValue(operadorDecimal, ubicacionMemoriaTemp);
+                                if (value.relativeValueInRange(operadorDecimal, ubicacionMemoriaTemp)) {
+                                    operadorDecimal = result;
+                                } else {
+                                    error = true;
+                                }
+                            }
                             if (!error) {
-                                String codigoOperacion = "";
                                 if (operadorDecimal != 0) {
+                                    if(operadorDecimal >= 0){
                                     codigoOperacion
                                             = value.getCodOp().replaceAll("\\?+$",
-                                                    String.format("%0" + contarCaracteres(value.getCodOp(), '?') + "X", operadorDecimal & 0xFFFFF));
-                                                    //String.format("%0" + contarCaracteres(value.getCodOp(), '?') + "X", NumeralSistemConverter.decimalToHexadecimal(operadorDecimal.toString())));
-
+                                                    String.format("%0" + contarCaracteres(value.getCodOp(), '?') + "X", operadorDecimal & 0xFFFFFFFF));
+                                    //String.format("%0" + contarCaracteres(value.getCodOp(), '?') + "X", NumeralSistemConverter.decimalToHexadecimal(operadorDecimal.toString())));
+                                    } else {
+                                      codigoOperacion
+                                            = value.getCodOp().replaceAll("\\?+$",
+                                                    String.format("%0" + contarCaracteres(value.getCodOp(), '?') + "X", operadorDecimal & 0xFF));
+                                      
+                                    }
                                 } else if (value.getModoDireccionamiento().getAbbreviation().equals("INH")) {
-                                    codigoOperacion = value.getCodOp();
-                                } else if (value.getModoDireccionamiento().getAbbreviation().equals("REL")) {
                                     codigoOperacion = value.getCodOp();
                                 }
                                 finalContent.append(codigoOperacion.replaceAll("(?s).{2}(?!$)", "$0 "));
@@ -411,6 +437,9 @@ public class Main {
                                 ubicacionMemoria += value.getLongInstruccion();
                             } else {
                                 finalContent.append("FDR");
+                                finalContent.append("\t\t");
+                                finalContent.append(value.getNombre() + " ");
+                                finalContent.append(palabra.length > 1 ? palabra[1] + " " : "    ");
                             }
                         } else {
                             finalContent.append("\t\t\t");
@@ -445,7 +474,7 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
     }
 
     private static int contarCaracteres(String codOp, char caracter) {
