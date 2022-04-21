@@ -1,5 +1,7 @@
-E3:	EQU 50
+
 	ORG $4000
+	ADDD E3
+E3:	EQU $50	
 E2:	EQU 15
 	ADCA #$15
 	ADCA $15
@@ -7,7 +9,6 @@ E2:	EQU 15
 	ADCA 150
 	ADCA 1500
 	ADDD #10
-	ADDD E3
 	DC.B
 	DC.B 10,11,12
 	DC.B "H","O","L","A"
