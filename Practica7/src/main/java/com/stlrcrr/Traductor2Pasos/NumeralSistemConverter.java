@@ -4,6 +4,8 @@
  */
 package com.stlrcrr.Traductor2Pasos;
 
+import java.util.Stack;
+
 /**
  *
  * @author Luis
@@ -12,49 +14,72 @@ public class NumeralSistemConverter {
     //decimal a hexa
     //binario a hexa
     //octal a hexa
-    
-    public static String decimalToHexadecimal(String number){
-        try{
-            int numberDecimal = Integer.parseInt(number);
-            return decimalToHexadecimal(numberDecimal);
-        } catch(NumberFormatException e){
+
+    public static String decimalToHexadecimal(String number, int cantChars) {
+        try {
+            Integer numberDecimal = Integer.parseInt(number);
+            String numberHex = "";
+            numberHex = decimalToHexadecimal(numberDecimal);
+            if (numberHex.length() < cantChars) {
+                for (int i = numberHex.length(); i < cantChars; i++) {
+                    numberHex = "0" + numberHex;
+                }
+            } else {
+                numberHex = numberHex.substring(numberHex.length()-cantChars, numberHex.length());
+            }
+
+            return numberHex;
+        } catch (NumberFormatException e) {
             return "FDR";
         }
     }
-    
-    public static String binaryToHexadecimal(String number){          
-        try{
+
+    public static String binaryToHexadecimal(String number) {
+        try {
             int numberDecimal = binartToDecimal(Integer.parseInt(number));
-            if(validateBinario(numberDecimal)){
-                return decimalToHexadecimal(numberDecimal);  
+            if (validateBinario(number)) {
+                return decimalToHexadecimal(numberDecimal);
             } else {
                 return "FDR";
             }
-        } catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             return "FDR";
         }
     }
-    
-    public static String octalToHexadecimal(String octal){
-        try{
+
+    public static String octalToHexadecimal(String octal) {
+        try {
             int decimalNumber = Integer.parseInt(octal);
-            if(validateOctal(decimalNumber)){                
-                return decimalToHexadecimal(decimalNumber);  
+            if (validateOctal(decimalNumber)) {
+                return decimalToHexadecimal(decimalNumber);
             } else {
                 return "FDR";
             }
-        } catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             return "FDR";
         }
     }
-    
+
+    public static String decimalToBinario(String decimal, int cantDigits) {
+        return decimalToBinary(Integer.parseInt(decimal), cantDigits);
+    }
+
     //De Decimal a otras bases
-    private static String decimalToBinary(int decimal) {
+    private static String decimalToBinary(int decimal, int cantDigits) {
         String binario = "";
-        while (decimal > 0) {
+        /*while (decimal > 0) {
             binario = decimal % 2 + binario;
             decimal = decimal / 2;
+        }*/
+        binario = Long.toBinaryString(decimal);
+        if (binario.length() < cantDigits) {
+            for (int i = binario.length(); i < cantDigits; i++) {
+                binario = "0" + binario;
+            }
+        } else {
+            binario = binario.substring(binario.length()-cantDigits, binario.length());
         }
+
         return binario;
     }
 
@@ -83,7 +108,7 @@ public class NumeralSistemConverter {
                 decimal = decimal / 16;
             }
         }*/
-        return Integer.toHexString(decimal).toUpperCase();
+        return Long.toHexString(decimal).toUpperCase();
     }
 
 // Conversiones de otras bases a decimal
@@ -134,7 +159,7 @@ public class NumeralSistemConverter {
     }
 
 // Validadores
-    private static boolean validateBinario(int binario) {
+    private static boolean validateBinario(String binario) {
         // Comprobar si solo se compone de unos y ceros
         String binarioComoCadena = String.valueOf(binario);
         for (int i = 0; i < binarioComoCadena.length(); i++) {
@@ -172,5 +197,60 @@ public class NumeralSistemConverter {
             }
         }
         return true;
+    }
+
+    private static String complementoA2(Integer valor) {
+        String valorOriginal = decimalToBinario(valor.toString(), 8);
+        StringBuilder complemento1 = new StringBuilder();
+        String complemento2 = "";
+        for (int i = 0; i < valorOriginal.length(); i++) {
+            complemento1.append(1 ^ valorOriginal.charAt(i));
+        }
+        complemento2 = addBinary(complemento1.toString(), "1");
+        return complemento2;
+    }
+
+    private static String addBinary(String a, String b) {
+        Stack<Boolean> sa = new Stack<>();
+        Stack<Boolean> sb = new Stack<>();
+        for (char ch : a.toCharArray()) {
+            sa.push(ch == '1');
+        }
+        for (char ch : b.toCharArray()) {
+            sb.push(ch == '1');
+        }
+        Stack<Boolean> ans = new Stack<>();
+        boolean ta, tb, s, car = false;
+        while (true) {
+            if (!sa.isEmpty()) {
+                ta = sa.pop();
+            } else {
+                ta = false;
+            }
+            if (!sb.isEmpty()) {
+                tb = sb.pop();
+            } else {
+                tb = false;
+            }
+            s = ta ^ tb ^ car;
+            car = (ta & tb) | (ta & car) | (tb & car);
+            ans.push(s);
+            if (sa.empty() && sb.empty()) {
+                break;
+            }
+        }
+        if (car) {
+            ans.push(car);
+        }
+        StringBuilder res = new StringBuilder();
+        while (!ans.empty()) {
+            boolean tmp = ans.pop();
+            if (tmp) {
+                res.append('1');
+            } else {
+                res.append('0');
+            }
+        }
+        return res.toString();
     }
 }

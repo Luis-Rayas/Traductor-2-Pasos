@@ -33,18 +33,6 @@ public class AddressingMode {
             case "IDX":
                 buildModeAdrresing("Indexed",bitsize, "IDX");
                 break;
-            case "IDX1":
-                buildModeAdrresing("Indexed",bitsize, "IDX1");
-                break;
-            case "IDX2":
-                buildModeAdrresing("Indexed-Indirect",bitsize, "IDX2");
-                break;
-            case "[IDX2]":
-                buildModeAdrresing("Indexed-Indirect",bitsize, "[IDX2]");
-                break;
-            case "[D,IDX]":
-                buildModeAdrresing("Indexed-Indirect",bitsize, "[D,IDX]");
-                break;
             default:
                 buildModeAdrresing("NA", 0,"NA");
                 break;

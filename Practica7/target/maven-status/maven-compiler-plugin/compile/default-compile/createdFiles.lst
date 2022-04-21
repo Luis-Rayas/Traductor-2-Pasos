@@ -1,3 +1,8 @@
-com\stlrcrr\practica6\Traductor.class
-com\stlrcrr\practica6\Main.class
-com\stlrcrr\practica6\Mnemonico.class
+com\stlrcrr\Traductor2Pasos\GFG.class
+com\stlrcrr\Traductor2Pasos\AddressingMode.class
+com\stlrcrr\Traductor2Pasos\Directiva.class
+com\stlrcrr\Traductor2Pasos\NumeralSistemConverter.class
+com\stlrcrr\Traductor2Pasos\Main.class
+com\stlrcrr\Traductor2Pasos\Mnemonico.class
+com\stlrcrr\Traductor2Pasos\Etiqueta.class
+com\stlrcrr\Traductor2Pasos\TabCop.class

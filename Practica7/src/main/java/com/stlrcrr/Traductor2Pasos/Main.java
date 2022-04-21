@@ -27,8 +27,9 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            File fileIn = new File("..\\test.asm");
+            File fileIn = new File("..\\P11.asm");
             File fileOut = new File("..\\" + fileIn.getName().replace(".asm", "") + ".lst");
+            File fileTabSim = new File("..\\" + fileIn.getName().replace(".asm", "") + ".tabsim");
             BufferedReader obj = null;
 
             String line = "";
@@ -47,14 +48,16 @@ public class Main {
             TabCop tab = new TabCop();
 
             boolean error;
+            boolean operadorPosEtiqueta;
             boolean tieneEtiqueta;
             Integer vuelta = 1;
             try {
                 do {
+                    operadorPosEtiqueta = false;
                     obj = new BufferedReader(new FileReader(fileIn));
                     finalContent = new StringBuilder();
                     while ((line = obj.readLine()) != null) {//lectura de linea por linea del archivo 
-                        line = line.replace("\t", "").trim();
+                        line = line.replace("\t", " ").trim();
                         line = line.replace(";", " ;");
                         line = line.replace(":", ": ");
                         palabra = line.split(" ");
@@ -63,21 +66,12 @@ public class Main {
                         error = false;
                         tieneEtiqueta = false;
                         operadorDecimal = null;
+                        tab.resetTablesMnemonicosIDX();
+                        if (vuelta == 2) {
+                            System.out.println("holi");
+                        }
 
                         finalContent.append(String.format("%04X", ubicacionMemoria & 0xFFFFF) + " ");
-                        if (palabra[0].contains(":")) { //es una etiqueta
-                            //finalContent.append(palabra[0] + " ");
-                            tieneEtiqueta = true;
-                            tab.getEtiquetas().put(palabra[0].replace(":", "").trim(),
-                                    new Etiqueta(palabra[0].replace(":", "").trim(), ubicacionMemoria));
-                            etiqueta = palabra[0].replace(":", "").trim();
-                            line = line.replace(palabra[0], "").trim(); //reseteamos la linea sin la etiqueta
-                            palabra = line.split(" ");
-                        } else if (line.contains(";")) {//comentario
-                            comentario = palabra[palabra.length - 1];
-                            line = line.replace(comentario, "").trim(); //reseteamos la linea sin la etiqueta
-                            palabra = line.split(" ");
-                        }
                         if (tab.getDirectivas().containsKey(palabra[0])) { //es una directiva o pseudoinstruccion
                             for (Map.Entry entry : tab.getDirectivas().entrySet()) {
                                 if (palabra[0].equals(entry.getKey())) {
@@ -90,7 +84,22 @@ public class Main {
                                 }
                             }
                         } else if (tab.getMnemonicos().contains(palabra[0])) { // es un mnemonico
-                            if (tab.getMnemonicosINH().containsKey(palabra[0]) && value == null) { // es un inherente
+                            if (palabra.length > 1 && palabra[1].contains(",") && tab.getMnemonicosIDX().containsKey(palabra[0])) { //el operador tiene coma y es indexado
+                                if (tab.getMnemonicosIDX().containsKey(palabra[0]) && value == null) {
+                                    for (Map.Entry entry : tab.getMnemonicosIDX().entrySet()) {
+                                        if (palabra[0].equals(entry.getKey())) {
+                                            value = (Mnemonico) entry.getValue();
+                                            try {
+                                                value.setModoIndexadoIDX(palabra[1]);
+                                            } catch (Exception e) {
+                                                System.out.println("Error en INDEXADO: " + e.getMessage() + "\t" + line);
+                                                error = true;
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                            } else if (tab.getMnemonicosINH().containsKey(palabra[0]) && value == null) { // es un inherente
                                 for (Map.Entry entry : tab.getMnemonicosINH().entrySet()) {
                                     if (palabra[0].equals(entry.getKey())) {
                                         value = (Mnemonico) entry.getValue();
@@ -133,18 +142,6 @@ public class Main {
                                 } else {
                                     error = true;
                                 }
-                            } else if (tab.getMnemonicosIDX().containsKey(palabra[0])) { // es Inherente
-                                if (tab.getMnemonicosIDX().containsKey(palabra[0]) && value == null) {
-                                    for (Map.Entry entry : tab.getMnemonicosINH().entrySet()) {
-                                        if (palabra[0].equals(entry.getKey())) {
-                                            value = (Mnemonico) entry.getValue();
-                                            value.setModoIndexadoIDX(palabra[1]);
-                                            break;
-                                        }
-                                    }
-                                } else {
-                                    error = true;
-                                }
                             }// es extendido o es Directo
                             if (operadorDecimal == null) { //obtener el codigo de operacion
                                 if (tab.getEtiquetas().containsKey(palabra[1])) {
@@ -173,6 +170,7 @@ public class Main {
                                             operadorDecimal = Long.parseLong(palabra[1]);
                                         } catch (NumberFormatException e) {
                                             //es probablemente una etiqueta
+                                            operadorPosEtiqueta = true;
                                         }
                                     }
                                 }
@@ -205,8 +203,22 @@ public class Main {
                                     }
                                 }
                             }
+                        } else {
+                            //es probablemente una etiqueta
+                            if (palabra[0].contains(":") || palabra.length >= 2) { //es una etiqueta
+                                //finalContent.append(palabra[0] + " ");
+                                tieneEtiqueta = true;
+                                tab.getEtiquetas().put(palabra[0].replace(":", "").trim(),
+                                        new Etiqueta(palabra[0].replace(":", "").trim(), ubicacionMemoria));
+                                etiqueta = palabra[0].replace(":", "").trim();
+                                line = line.replace(palabra[0], "").trim(); //reseteamos la linea sin la etiqueta
+                                palabra = line.split(" ");
+                            } else if (line.contains(";")) {//comentario
+                                comentario = palabra[palabra.length - 1];
+                                line = line.replace(comentario, "").trim(); //reseteamos la linea sin la etiqueta
+                                palabra = line.split(" ");
+                            }
                         }
-                        //es probablemente una etiqueta                        
                         if (directiva != null) {
                             String codigoOperacion = "";
                             if (directiva.getOperador() != null) {
@@ -230,13 +242,14 @@ public class Main {
                             switch (directiva.getNombre()) {
                                 case "ORG":
                                     ubicacionMemoria = Long.parseLong(operadorDecimal.toString(), 10);
-                                    finalContent.append("\t\t\t" + directiva.getNombre() + " $" + NumeralSistemConverter.decimalToHexadecimal(ubicacionMemoria.toString()));
+                                    finalContent.append("\t\t\t" + directiva.getNombre() + " $" + NumeralSistemConverter.decimalToHexadecimal(ubicacionMemoria.toString(), 4));
                                     break;
                                 case "END":
                                     finalContent.append("\t\t\t" + directiva.getNombre());
                                     if (tieneEtiqueta) {
                                         finalContent.append("\t\t");
                                         finalContent.append(etiqueta + ":");
+                                        finalContent.append("\t");
                                     }
                                     break;
                                 case "START":
@@ -391,30 +404,21 @@ public class Main {
                             }
                         } else if (value != null) {
                             String codigoOperacion = "";
-                            if (value.getModoDireccionamiento().getAbbreviation().equals("REL")) { //validar rango del relativo
-                                Long ubicacionMemoriaTemp = ubicacionMemoria + value.getLongInstruccion();
-                                codigoOperacion = value.getCodOp();
-                                Long result = value.getRelativeValue(operadorDecimal, ubicacionMemoriaTemp);
-                                if (value.relativeValueInRange(operadorDecimal, ubicacionMemoriaTemp)) {
-                                    operadorDecimal = result;
-                                } else {
-                                    error = true;
-                                }
-                            }
-                            if (!error) {
-                                if (operadorDecimal != 0) {
-                                    if(operadorDecimal >= 0){
-                                    codigoOperacion
-                                            = value.getCodOp().replaceAll("\\?+$",
-                                                    String.format("%0" + contarCaracteres(value.getCodOp(), '?') + "X", operadorDecimal & 0xFFFFFFFF));
-                                    //String.format("%0" + contarCaracteres(value.getCodOp(), '?') + "X", NumeralSistemConverter.decimalToHexadecimal(operadorDecimal.toString())));
+                            if (!error && vuelta != 1) {
+                                if (operadorDecimal != null && operadorDecimal != 0) {
+                                    if (operadorDecimal >= 0) {
+                                        codigoOperacion
+                                                = value.getCodOp().replaceAll("\\?+$",
+                                                        String.format("%0" + contarCaracteres(value.getCodOp(), '?') + "X", operadorDecimal & 0xFFFFFFFF));
+                                        //String.format("%0" + contarCaracteres(value.getCodOp(), '?') + "X", NumeralSistemConverter.decimalToHexadecimal(operadorDecimal.toString())));
                                     } else {
-                                      codigoOperacion
-                                            = value.getCodOp().replaceAll("\\?+$",
-                                                    String.format("%0" + contarCaracteres(value.getCodOp(), '?') + "X", operadorDecimal & 0xFF));
-                                      
+                                        codigoOperacion
+                                                = value.getCodOp().replaceAll("\\?+$",
+                                                        String.format("%0" + contarCaracteres(value.getCodOp(), '?') + "X", operadorDecimal & 0xFF));
+
                                     }
-                                } else if (value.getModoDireccionamiento().getAbbreviation().equals("INH")) {
+                                } else if (value.getModoDireccionamiento().getAbbreviation().equals("INH") || value.getModoDireccionamiento().getAbbreviation().equals("IDX")) {
+                                    codigoOperacion = "";
                                     codigoOperacion = value.getCodOp();
                                 }
                                 finalContent.append(codigoOperacion.replaceAll("(?s).{2}(?!$)", "$0 "));
@@ -425,6 +429,7 @@ public class Main {
                                 finalContent.append(value.getCodOp());*/
                                 finalContent.append("\t");
                                 if (tieneEtiqueta) {
+                                    finalContent.append("\t\t");
                                     finalContent.append(etiqueta);
                                     finalContent.append("\t");
                                 } else {
@@ -440,13 +445,14 @@ public class Main {
                                 finalContent.append("\t\t");
                                 finalContent.append(value.getNombre() + " ");
                                 finalContent.append(palabra.length > 1 ? palabra[1] + " " : "    ");
+                                finalContent.append("\t\t");
                             }
                         } else {
                             finalContent.append("\t\t\t");
                             finalContent.append(palabra[0] + " ");
                             finalContent.append(palabra.length > 1 ? palabra[1] + " " : "    ");
-                            finalContent.append("\t\t");
                             if (tieneEtiqueta) {
+                                finalContent.append("\t\t");
                                 finalContent.append(etiqueta);
                                 finalContent.append("\t");
                             } else {
@@ -469,6 +475,18 @@ public class Main {
                 FileWriter fw = new FileWriter(fileOut);
                 BufferedWriter bw = new BufferedWriter(fw);
                 bw.write(finalContent.toString());
+                bw.flush();
+            }
+            if (!tab.getEtiquetas().isEmpty()) {
+                if (!fileTabSim.exists()) {
+                    fileTabSim.createNewFile();
+                }
+                FileWriter fw = new FileWriter(fileTabSim);
+                BufferedWriter bw = new BufferedWriter(fw);
+                for (Map.Entry entry : tab.getEtiquetas().entrySet()) {
+                    Etiqueta e = (Etiqueta) entry.getValue();
+                    bw.write(e.getNombre() + " $" + NumeralSistemConverter.decimalToHexadecimal(e.getValor().toString(), 4) + "\n");
+                }
                 bw.flush();
             }
         } catch (Exception e) {

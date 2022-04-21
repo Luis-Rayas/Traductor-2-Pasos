@@ -51,6 +51,10 @@ public class TabCop {
         buildTableIDX();
     }   
     
+    public void resetTablesMnemonicosIDX(){
+        buildTableIDX();
+    }
+    
     private void buildTableINH(){
         mnemonicosINH.put("ABA", new Mnemonico("ABA", "INH", 2, "1606"));
         mnemonicosINH.put("ASLA", new Mnemonico("ASLA", "INH", 1, "48"));
@@ -77,6 +81,7 @@ public class TabCop {
         
         mnemonicosIMM.put("ANDA", new Mnemonico("ANDA", "IMM", 2, "84??"));
         mnemonicosIMM.put("ANDB", new Mnemonico("ANDB", "IMM", 2, "C4??"));
+        mnemonicosIMM.put("LDAA", new Mnemonico("LDAA", "IMM", 2, "86??"));
     }
     
     private void buildTableDIR(){
@@ -89,6 +94,7 @@ public class TabCop {
         mnemonicosDIR.put("ANDA", new Mnemonico("ANDA", "DIR", 2, "94??"));
         mnemonicosDIR.put("ANDB", new Mnemonico("ANDB", "DIR", 2, "D4??"));
         mnemonicosDIR.put("BCLR", new Mnemonico("BCLR", "DIR", 3, "4D????"));
+        mnemonicosDIR.put("LDAA", new Mnemonico("LDAA", "DIR", 2, "96??"));
     }
     
     private void buildTableEXT(){
@@ -103,21 +109,26 @@ public class TabCop {
         mnemonicosEXT.put("ASL", new Mnemonico("ASL", "EXT", 3, "78????"));
         mnemonicosEXT.put("ASR", new Mnemonico("ASR", "EXT", 3, "77????"));
         mnemonicosEXT.put("BCLR", new Mnemonico("BCLR", "EXT", 3, "1D????"));
+        mnemonicosEXT.put("LDAA", new Mnemonico("LDAA", "EXT", 3, "B6????"));
+        mnemonicosEXT.put("JMP", new Mnemonico("JMP", "EXT", 3, "06????"));
     }
     
-    private void buildTableIDX() {        
-        mnemonicosIDX.put("ABX", new Mnemonico("ABX"));
-        mnemonicosIDX.put("ABY", new Mnemonico("ABY"));
-        mnemonicosIDX.put("ADCA", new Mnemonico("ADCA"));
-        mnemonicosIDX.put("ADCB", new Mnemonico("ADCB"));
-        mnemonicosIDX.put("ADDA", new Mnemonico("ADDA"));
-        mnemonicosIDX.put("ADDB", new Mnemonico("ADDB"));
-        mnemonicosIDX.put("ADDD", new Mnemonico("ADDD"));
-        mnemonicosIDX.put("ANDA", new Mnemonico("ANDA"));
-        mnemonicosIDX.put("ANDB", new Mnemonico("ANDB"));
-        mnemonicosIDX.put("ASL", new Mnemonico("ASL"));
-        mnemonicosIDX.put("ASR", new Mnemonico("ASR"));
-        mnemonicosIDX.put("BCLR", new Mnemonico("BCLR"));
+    private void buildTableIDX() {
+        mnemonicosIDX.clear();
+        mnemonicosIDX.put("ABX", new Mnemonico("ABX", "1AE5"));
+        mnemonicosIDX.put("ABY", new Mnemonico("ABY", "19ED"));
+        mnemonicosIDX.put("ADCA", new Mnemonico("ADCA", "A9"));
+        mnemonicosIDX.put("ADCB", new Mnemonico("ADCB", "E9"));
+        mnemonicosIDX.put("ADDA", new Mnemonico("ADDA", "AB"));
+        mnemonicosIDX.put("ADDB", new Mnemonico("ADDB", "EB"));
+        mnemonicosIDX.put("ADDD", new Mnemonico("ADDD", "E3"));
+        mnemonicosIDX.put("ANDA", new Mnemonico("ANDA", "A4"));
+        mnemonicosIDX.put("ANDB", new Mnemonico("ANDB", "E4"));
+        mnemonicosIDX.put("ASL", new Mnemonico("ASL", "68"));
+        mnemonicosIDX.put("ASR", new Mnemonico("ASR", "67"));
+        mnemonicosIDX.put("BCLR", new Mnemonico("BCLR", "0D"));
+        mnemonicosIDX.put("LDAA", new Mnemonico("LDAA", "A6"));
+        mnemonicosIDX.put("JMP", new Mnemonico("JMP", "05"));
     }
     
     private void buildList(){
@@ -147,6 +158,8 @@ public class TabCop {
         
         this.mnemonicos.add("BGND");
         this.mnemonicos.add("BNE");
+        this.mnemonicos.add("JMP");
+        this.mnemonicos.add("LDAA");
     }
 
     private void buildTableDirectivas(){
@@ -235,7 +248,10 @@ public class TabCop {
         this.mnemonicosIDX = mnemonicosIDX;
     }
 
-    
+    public static void main(String[] args) {
+        System.out.println(Long.toHexString(-16));
+        System.out.println(Long.toBinaryString(-16));
+    }
     
     
     
