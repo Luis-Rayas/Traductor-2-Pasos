@@ -27,7 +27,7 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            File fileIn = new File("..\\P11.asm");
+            File fileIn = new File("..\\P13.asm");
             File fileOut = new File("..\\" + fileIn.getName().replace(".asm", "") + ".lst");
             File fileTabSim = new File("..\\" + fileIn.getName().replace(".asm", "") + ".tabsim");
             BufferedReader obj = null;
@@ -67,11 +67,26 @@ public class Main {
                         tieneEtiqueta = false;
                         operadorDecimal = null;
                         tab.resetTablesMnemonicosIDX();
-                        if (vuelta == 2) {
+                        /*if (vuelta == 2) {
                             System.out.println("holi");
-                        }
+                        }*/
 
                         finalContent.append(String.format("%04X", ubicacionMemoria & 0xFFFFF) + " ");
+                        //es probablemente una etiqueta
+                        if (palabra[0].contains(":") 
+                                || (!tab.getMnemonicos().contains(palabra[0]) && !tab.getDirectivas().containsKey(palabra[0]))) { //es una etiqueta
+                            //finalContent.append(palabra[0] + " ");
+                            tieneEtiqueta = true;
+                            tab.getEtiquetas().put(palabra[0].replace(":", "").trim(),
+                                    new Etiqueta(palabra[0].replace(":", "").trim(), ubicacionMemoria));
+                            etiqueta = palabra[0].replace(":", "").trim();
+                            line = line.replace(palabra[0], "").trim(); //reseteamos la linea sin la etiqueta
+                            palabra = line.split(" ");
+                        } else if (line.contains(";")) {//comentario
+                            comentario = palabra[palabra.length - 1];
+                            line = line.replace(comentario, "").trim(); //reseteamos la linea sin la etiqueta
+                            palabra = line.split(" ");
+                        }
                         if (tab.getDirectivas().containsKey(palabra[0])) { //es una directiva o pseudoinstruccion
                             for (Map.Entry entry : tab.getDirectivas().entrySet()) {
                                 if (palabra[0].equals(entry.getKey())) {
@@ -204,20 +219,7 @@ public class Main {
                                 }
                             }
                         } else {
-                            //es probablemente una etiqueta
-                            if (palabra[0].contains(":") || palabra.length >= 2) { //es una etiqueta
-                                //finalContent.append(palabra[0] + " ");
-                                tieneEtiqueta = true;
-                                tab.getEtiquetas().put(palabra[0].replace(":", "").trim(),
-                                        new Etiqueta(palabra[0].replace(":", "").trim(), ubicacionMemoria));
-                                etiqueta = palabra[0].replace(":", "").trim();
-                                line = line.replace(palabra[0], "").trim(); //reseteamos la linea sin la etiqueta
-                                palabra = line.split(" ");
-                            } else if (line.contains(";")) {//comentario
-                                comentario = palabra[palabra.length - 1];
-                                line = line.replace(comentario, "").trim(); //reseteamos la linea sin la etiqueta
-                                palabra = line.split(" ");
-                            }
+                            
                         }
                         if (directiva != null) {
                             String codigoOperacion = "";
